@@ -58,7 +58,7 @@ func dataSourceDomainCheckRead(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
 	domainString := d.Get("domain").(string)
 
-	response := m.Client.GetDomainCheck(domainString)
+	response := m.Client().GetDomainCheck(domainString)
 
 	log.Printf(
 		"[DEBUG] Got status code %v from ImprovMX API on Read for domain check %s, success: %v, errors: %v.",

@@ -37,7 +37,7 @@ func resourceSMTPCredentialCreate(d *schema.ResourceData, meta interface{}) erro
 	m := meta.(*Meta)
 
 	for {
-		resp := m.Client.CreateSMTPCredential(d.Get("domain").(string), d.Get("username").(string), d.Get("password").(string))
+		resp := m.Client().CreateSMTPCredential(d.Get("domain").(string), d.Get("username").(string), d.Get("password").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Create for SMTP %s@%s, success: %v, errors: %v.", resp.Code, d.Get("username").(string), d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -59,11 +59,9 @@ func resourceSMTPCredentialCreate(d *schema.ResourceData, meta interface{}) erro
 
 func resourceSMTPCredentialRead(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
 	for {
-		resp := m.Client.GetSMTPCredential(d.Get("domain").(string))
+		resp := m.Client().GetSMTPCredential(d.Get("domain").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Read for SMTP domain %s, success: %v, errors: %v.", resp.Code, d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -89,7 +87,7 @@ func resourceSMTPCredentialUpdate(d *schema.ResourceData, meta interface{}) erro
 	m := meta.(*Meta)
 
 	for {
-		resp := m.Client.UpdateSMTPCredential(d.Get("domain").(string), d.Get("username").(string), d.Get("password").(string))
+		resp := m.Client().UpdateSMTPCredential(d.Get("domain").(string), d.Get("username").(string), d.Get("password").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Update for SMTP domain %s@%s, success: %v, errors: %v.", resp.Code, d.Get("username").(string), d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -111,10 +109,8 @@ func resourceSMTPCredentialUpdate(d *schema.ResourceData, meta interface{}) erro
 
 func resourceSMTPCredentialDelete(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
-	m.Client.DeleteSMTPCredential(d.Get("domain").(string), d.Get("username").(string))
+	m.Client().DeleteSMTPCredential(d.Get("domain").(string), d.Get("username").(string))
 
 	return nil
 }

@@ -41,21 +41,17 @@ func resourceEmailForward() *schema.Resource {
 
 func resourceEmailForwardCreate(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
-	m.Client.CreateEmailForward(d.Get("domain").(string), d.Get("alias_name").(string), d.Get("destination_email").(string))
+	m.Client().CreateEmailForward(d.Get("domain").(string), d.Get("alias_name").(string), d.Get("destination_email").(string))
 
 	return resourceEmailForwardRead(d, meta)
 }
 
 func resourceEmailForwardRead(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
 	for {
-		resp := m.Client.GetEmailForward(d.Get("domain").(string), d.Get("alias_name").(string))
+		resp := m.Client().GetEmailForward(d.Get("domain").(string), d.Get("alias_name").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Read for email_forward %s@%s, success: %v, errors: %v.", resp.Code, d.Get("alias_name").(string), d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -81,11 +77,9 @@ func resourceEmailForwardRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceEmailForwardUpdate(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
 	for {
-		resp := m.Client.UpdateEmailForward(d.Get("domain").(string), d.Get("alias_name").(string), d.Get("destination_email").(string))
+		resp := m.Client().UpdateEmailForward(d.Get("domain").(string), d.Get("alias_name").(string), d.Get("destination_email").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Update for email_forward %s@%s, success: %v, errors: %v.", resp.Code, d.Get("domain").(string), d.Get("alias_name").(string), resp.Success, resp.Errors)
 
@@ -107,10 +101,8 @@ func resourceEmailForwardUpdate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceEmailForwardDelete(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
-	m.Client.DeleteEmailForward(d.Get("domain").(string), d.Get("alias_name").(string))
+	m.Client().DeleteEmailForward(d.Get("domain").(string), d.Get("alias_name").(string))
 
 	return nil
 }

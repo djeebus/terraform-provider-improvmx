@@ -39,7 +39,7 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
 
 	for {
-		resp := m.Client.CreateDomain(d.Get("domain").(string), d.Get("notification_email").(string), d.Get("whitelabel").(string))
+		resp := m.Client().CreateDomain(d.Get("domain").(string), d.Get("notification_email").(string), d.Get("whitelabel").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Create for domain %s, success: %v, errors: %v.", resp.Code, d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -54,24 +54,21 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		if resp.Success {
-			resp2 := m.Client.DeleteEmailForward(d.Get("domain").(string), "*")
+			resp2 := m.Client().DeleteEmailForward(d.Get("domain").(string), "*")
 			if resp2.Success {
 				return resourceDomainRead(d, meta)
-			}else{
+			} else {
 				return fmt.Errorf("HTTP response code %d, Failed to delete initial wildcard", resp2.Code)
 			}
-		
 		}
 	}
 }
 
 func resourceDomainRead(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
 	for {
-		resp := m.Client.GetDomain(d.Get("domain").(string))
+		resp := m.Client().GetDomain(d.Get("domain").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Read for domain %s, success: %v, errors: %v.", resp.Code, d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -100,7 +97,7 @@ func resourceDomainUpdate(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
 
 	for {
-		resp := m.Client.UpdateDomain(d.Get("domain").(string), d.Get("notification_email").(string), d.Get("whitelabel").(string))
+		resp := m.Client().UpdateDomain(d.Get("domain").(string), d.Get("notification_email").(string), d.Get("whitelabel").(string))
 
 		log.Printf("[DEBUG] Got status code %v from ImprovMX API on Update for domain %s, success: %v, errors: %v.", resp.Code, d.Get("domain").(string), resp.Success, resp.Errors)
 
@@ -122,10 +119,8 @@ func resourceDomainUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceDomainDelete(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
 
-	m.Client.DeleteDomain(d.Get("domain").(string))
+	m.Client().DeleteDomain(d.Get("domain").(string))
 
 	return nil
 }
